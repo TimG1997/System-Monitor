@@ -2,10 +2,22 @@
 
 #include "format.h"
 
-using std::string;
+using namespace std;
 
-// TODO: Complete this helper function
-// INPUT: Long int measuring seconds
-// OUTPUT: HH:MM:SS
-// REMOVE: [[maybe_unused]] once you define the function
-string Format::ElapsedTime(long seconds[[maybe_unused]]) { return string(); }
+string Format::ElapsedTime(long total_in_seconds) {
+  long hours, minutes, seconds;
+
+  minutes = total_in_seconds / 60;
+  seconds = total_in_seconds % 60;
+
+  hours = minutes / 60;
+  minutes = minutes % 60;
+
+  return Format::AddLeadingZero(hours) + ":" +
+         Format::AddLeadingZero(minutes) + ":" +
+         Format::AddLeadingZero(seconds);
+}
+
+string Format::AddLeadingZero(long time){
+  return time < 10 ? "0" + to_string(time) : to_string(time);
+}
