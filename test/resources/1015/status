@@ -1,0 +1,55 @@
+Name:   init
+Umask:  0022
+State:  S (sleeping)
+Tgid:   1015
+Ngid:   0
+Pid:    1015
+PPid:   1
+TracerPid:      0
+Uid:    0       0       0       0
+Gid:    0       0       0       0
+FDSize: 128
+Groups:
+NStgid: 1015
+NSpid:  1015
+NSpgid: 1015
+NSsid:  1015
+VmPeak:     1632 kB
+VmSize:     1632 kB
+VmLck:         0 kB
+VmPin:         0 kB
+VmHWM:       568 kB
+VmRSS:       568 kB
+RssAnon:             548 kB
+RssFile:              20 kB
+RssShmem:              0 kB
+VmData:      876 kB
+VmStk:       132 kB
+VmExe:       448 kB
+VmLib:         0 kB
+VmPTE:        40 kB
+VmSwap:        0 kB
+HugetlbPages:          0 kB
+CoreDumping:    0
+THP_enabled:    1
+Threads:        1
+SigQ:   2/50859
+SigPnd: 0000000000000000
+ShdPnd: 0000000000000000
+SigBlk: 0000000000010000
+SigIgn: fffffffc7ff8fefe
+SigCgt: 0000000000010000
+CapInh: 0000000000000000
+CapPrm: 0000003fffffffff
+CapEff: 0000003fffffffff
+CapBnd: 0000003fffffffff
+CapAmb: 0000000000000000
+NoNewPrivs:     0
+Seccomp:        0
+Speculation_Store_Bypass:       thread vulnerable
+Cpus_allowed:   3f
+Cpus_allowed_list:      0-5
+Mems_allowed:   1
+Mems_allowed_list:      0
+voluntary_ctxt_switches:        1
+nonvoluntary_ctxt_switches:     0
