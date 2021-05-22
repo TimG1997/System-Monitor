@@ -7,7 +7,11 @@ include_directories(${CURSES_INCLUDE_DIRS})
 # Add GoogleTest library subdirectories
 add_subdirectory(thirdparty/googletest)
 
-add_executable(test src/format.cpp test/utest_rp_format.cpp src/linux_parser.cpp test/utest_rp_linux_parser.cpp)
+add_executable(test src/format.cpp test/utest_rp_format.cpp
+                    src/linux_parser.cpp test/utest_rp_linux_parser.cpp
+                    src/memory_helper.cpp test/utest_rp_memory_calculator.cpp
+                    test/utest_rp_string_helper.cpp
+                    src/cpu_helper.cpp test/utest_rp_cpu_helper.cpp)
 
 file(COPY test/resources DESTINATION Testing)
 
@@ -19,7 +23,7 @@ target_link_libraries(test
 include_directories(include)
 file(GLOB SOURCES "src/*.cpp")
 
-add_executable(monitor ${SOURCES} include/linux_info_file_locations.h test/helper/test_helpers.h)
+add_executable(monitor ${SOURCES})
 
 set_property(TARGET monitor PROPERTY CXX_STANDARD 17)
 target_link_libraries(monitor ${CURSES_LIBRARIES})
