@@ -143,19 +143,32 @@ long LinuxParser::UpTime() {
 }
 
 long LinuxParser::Jiffies() {
-  string cpu, user, nice, system, idle, iowait, irq, softirq, steal, guest,
-      guest_nice;
   string line;
   std::ifstream stream(kProcDirectory + kStatFilename);
   if (stream.is_open()) {
     std::getline(stream, line);
-    std::istringstream linestream(line);
-    linestream >> cpu >> user >> nice >> system >> idle >> iowait >> irq >>
-        softirq >> steal >> guest >> guest_nice;
 
-    return stol(user) + stol(nice) + stol(system) + stol(idle) + stol(iowait) +
-           stol(irq) + stol(softirq) + stol(steal) + stol(guest) +
-           stol(guest_nice);
+    int skip_first_element = 1;
+    long cpu_jiffies_sum = 0;
+    vector<long> cpu_jiffies = StringHelper::GetElements<long>(
+        line, vector<int>{
+                  CPUStates::kUser_,
+                  CPUStates::kNice_,
+                  CPUStates::kSystem_,
+                  CPUStates::kIdle_,
+                  CPUStates::kIOwait_,
+                  CPUStates::kIRQ_,
+                  CPUStates::kSoftIRQ_,
+                  CPUStates::kSteal_,
+                  CPUStates::kGuest_,
+                  CPUStates::kGuestNice_,
+              }, skip_first_element);
+
+    for(auto &cpu_jiffie : cpu_jiffies){
+      cpu_jiffies_sum += cpu_jiffie;
+    }
+
+    return cpu_jiffies_sum;
   }
 
   return 0;
