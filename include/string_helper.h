@@ -12,7 +12,7 @@ template <typename T>
 T GetElement(std::string input, int index);
 
 template <typename T>
-std::vector<T> GetElements(std::string input, std::vector<int> indezes);
+std::vector<T> GetElements(std::string input, std::vector<int> indezes, int skip_elements = 0);
 
 inline std::vector<std::string> SplitString(std::string &string_to_split, char character) {
   std::vector<std::string> string_elements;
@@ -32,7 +32,7 @@ inline std::string GetStringLeftFromCharacter(std::string &input_string, char ch
 }
 
 template <typename T>
-inline std::vector<T> GetElements(std::string input, std::vector<int> indezes){
+inline std::vector<T> GetElements(std::string input, std::vector<int> indezes, int skip_elements){
   if(input.empty()){
     throw std::invalid_argument("The provided string is empty.");
   }
@@ -47,7 +47,12 @@ inline std::vector<T> GetElements(std::string input, std::vector<int> indezes){
   int indezes_index = 0;
 
   while(stream >> tmp){
-      if(element_index == (indezes[indezes_index] - 1)){
+      if(element_index < skip_elements){
+        element_index++;
+        continue;
+      }
+
+      if(element_index == (indezes[indezes_index] - 1 + skip_elements) + skip_elements){
         std::istringstream convert(tmp);
         T value;
         convert >> value;

@@ -48,10 +48,31 @@ TEST_F(StringHelperTest, TestGetElements) {
   vector<int> actual_elements =
       StringHelper::GetElements<int>(input, input_indezes);
 
-  EXPECT_EQ(1015, actual_elements[0]);
-  EXPECT_EQ(1, actual_elements[1]);
-  EXPECT_EQ(1015, actual_elements[2]);
-  EXPECT_EQ(-1, actual_elements[3]);
+  int expected_first_element = 1015;
+  int expected_second_element = 1;
+  int expected_third_element = 1015;
+  int expected_fourth_element = -1;
+
+  EXPECT_EQ(expected_first_element, actual_elements[0]);
+  EXPECT_EQ(expected_second_element, actual_elements[1]);
+  EXPECT_EQ(expected_third_element, actual_elements[2]);
+  EXPECT_EQ(expected_fourth_element, actual_elements[3]);
+}
+
+TEST_F(StringHelperTest, TestGetElementsWithSkippingElements){
+  string input = "element_to_skip 1 2 3";
+  vector<int> input_indezes{0,1,2};
+
+  int skip_first_element = 1;
+  vector<int> actual_elements = StringHelper::GetElements<int>(input, input_indezes, skip_first_element);
+
+  int expected_first_element = 1;
+  int expected_second_element = 2;
+  int expected_third_element = 3;
+
+  EXPECT_EQ(expected_first_element, actual_elements[0]);
+  EXPECT_EQ(expected_second_element, actual_elements[1]);
+  EXPECT_EQ(expected_third_element, actual_elements[2]);
 }
 
 TEST_F(StringHelperTest, TestSplitString) {
