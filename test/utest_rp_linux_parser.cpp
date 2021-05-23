@@ -94,7 +94,7 @@ TEST_F(LinuxParserTest, TestActiveJiffies) {
 }
 
 TEST_F(LinuxParserTest, TestIdleJiffies) {
-  long expected_idle_jiffies = 3319118;
+  long expected_idle_jiffies = 51246;
   long actual_idle_jiffies = linux_parser.IdleJiffies();
 
   EXPECT_EQ(expected_idle_jiffies, actual_idle_jiffies);
