@@ -151,3 +151,10 @@ TEST_F(LinuxParserTest, TestCpuUtilization) {
   EXPECT_EQ(expected_cpu_utilization_two, actual_cpu_utilization_two);
   EXPECT_EQ(expected_cpu_utilization_three, actual_cpu_utilization_three);
 }
+
+TEST_F(LinuxParserTest, TestUser){
+  string expected_user = "root";
+  string actual_user = linux_parser.User(kPidOne);
+
+  EXPECT_EQ(expected_user, actual_user);
+}

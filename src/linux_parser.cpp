@@ -33,10 +33,12 @@ LinuxParser::LinuxParser()
 
 // custom file locations (useful for testing)
 LinuxParser::LinuxParser(std::string proc_dir, std::string cmd_line_filename,
-                         std::string cpu_info_filename, std::string status_filename,
-                         std::string stat_filename, std::string up_time_filename,
-                         std::string mem_info_filename, std::string version_filename,
-                         std::string os_path, std::string password_path)
+                         std::string cpu_info_filename,
+                         std::string status_filename, std::string stat_filename,
+                         std::string up_time_filename,
+                         std::string mem_info_filename,
+                         std::string version_filename, std::string os_path,
+                         std::string password_path)
     : kProcDirectory(std::move(proc_dir)),
       kCmdlineFilename(std::move(cmd_line_filename)),
       kCpuinfoFilename(std::move(cpu_info_filename)),
@@ -47,7 +49,6 @@ LinuxParser::LinuxParser(std::string proc_dir, std::string cmd_line_filename,
       kVersionFilename(std::move(version_filename)),
       kOSPath(os_path),
       kPasswordPath(std::move(password_path)) {}
-
 
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
@@ -226,8 +227,8 @@ vector<string> LinuxParser::CpuUtilization(long clock_ticks_per_second) {
   for (int& pid : this->Pids()) {
     string combined_path = kProcDirectory + to_string(pid) + (kStatFilename);
     long active_jiffies = ActiveJiffies(pid);
-    long cpu_utilization =
-        CpuHelper::CalculateCpuUsage(pid, up_time, active_jiffies, clock_ticks_per_second);
+    long cpu_utilization = CpuHelper::CalculateCpuUsage(
+        pid, up_time, active_jiffies, clock_ticks_per_second);
 
     string cpu_utilization_string =
         "PID " + to_string(pid) + ": " + to_string(cpu_utilization);
@@ -332,15 +333,29 @@ string LinuxParser::Uid(int pid) {
   return string();
 }
 
-// TODO: Read and return the user associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::User(int pid) {
+  string line;
+  std::ifstream stream(kPasswordPath);
+  if (stream.is_open()) {
+    string user_uid = Uid(pid);
+    const char split_char = ':';
+
+    while (std::getline(stream, line)) {
+      vector<string> splitted_line =
+          StringHelper::SplitString(line, split_char);
+      bool line_contains_user_id =
+          std::find(splitted_line.begin(), splitted_line.end(), user_uid) !=
+          splitted_line.end();
+      if (line_contains_user_id) {
+        return StringHelper::GetStringLeftFromCharacter(line, split_char);
+      }
+    }
+  }
+
   return string();
 }
 
-long LinuxParser::UpTime(int pid) {
-  return UpTime() - StartTime(pid);
-}
+long LinuxParser::UpTime(int pid) { return UpTime() - StartTime(pid); }
 
 long LinuxParser::StartTime(int pid) {
   string line;
