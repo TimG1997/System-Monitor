@@ -19,7 +19,7 @@ inline std::string resolvePath(const std::string &relPath)
     }
     baseDir = baseDir.parent_path();
   }
-  throw std::runtime_error("File not found!");
+  throw std::runtime_error("File (relative path: " + relPath + ") not found!");
 }
 
 #endif  // MONITOR_TEST_HELPERS_H
