@@ -1,6 +1,8 @@
 #ifndef MONITOR_STRING_HELPER_H
 #define MONITOR_STRING_HELPER_H
 
+#include <algorithm>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -11,6 +13,23 @@ T GetElement(std::string input, int index);
 
 template <typename T>
 std::vector<T> GetElements(std::string input, std::vector<int> indezes);
+
+inline std::vector<std::string> SplitString(std::string &string_to_split, char character) {
+  std::vector<std::string> string_elements;
+
+  std::istringstream string_stream(string_to_split);
+  std::string element_of_string;
+  while (getline(string_stream, element_of_string, character)) {
+    string_elements.push_back(element_of_string);
+  }
+
+  return string_elements;
+}
+
+inline std::string GetStringLeftFromCharacter(std::string &input_string, char character,
+                                         int element_index = 0) {
+  return SplitString(input_string, character)[element_index];
+}
 
 template <typename T>
 inline std::vector<T> GetElements(std::string input, std::vector<int> indezes){
