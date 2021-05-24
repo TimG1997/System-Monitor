@@ -14,6 +14,10 @@ T GetElement(std::string input, int index);
 template <typename T>
 std::vector<T> GetElements(std::string input, std::vector<int> indezes, int skip_elements = 0);
 
+inline bool Contains(std::string input, std::string substring_to_check){
+  return input.find(substring_to_check) != std::string::npos;
+}
+
 inline std::vector<std::string> SplitString(std::string &string_to_split, char character) {
   std::vector<std::string> string_elements;
 

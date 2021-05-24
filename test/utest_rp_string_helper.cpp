@@ -1,8 +1,8 @@
 #include <string>
 #include <vector>
 
-#include "../include/string_helper.h"
 #include "gtest/gtest.h"
+#include "helper/string_helper.h"
 
 using namespace std;
 
@@ -95,4 +95,16 @@ TEST_F(StringHelperTest, TestGetStringBetweenCharacter) {
   string actual_String = StringHelper::GetStringLeftFromCharacter(input_string, split_character);
 
   EXPECT_EQ(expected_string, actual_String);
+}
+
+TEST_F(StringHelperTest, TestContains){
+  string input = "10 MB";
+  string string_one_to_check = "MB";
+  string string_two_to_check = "GB";
+
+  bool contains_string_one = StringHelper::Contains(input, string_one_to_check);
+  bool contains_string_two = StringHelper::Contains(input, string_two_to_check);
+
+  EXPECT_TRUE(contains_string_one);
+  EXPECT_FALSE(contains_string_two);
 }
