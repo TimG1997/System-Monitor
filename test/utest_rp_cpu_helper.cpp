@@ -1,6 +1,5 @@
 #include "gtest/gtest.h"
-
-#include "../include/cpu_helper.h"
+#include "helper/cpu_helper.h"
 
 class CpuHelperTest : public ::testing::Test{};
 
