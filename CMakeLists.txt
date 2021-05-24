@@ -7,11 +7,10 @@ include_directories(${CURSES_INCLUDE_DIRS})
 # Add GoogleTest library subdirectories
 add_subdirectory(thirdparty/googletest)
 
-add_executable(test src/format.cpp test/utest_rp_format.cpp
-                    src/linux_parser.cpp test/utest_rp_linux_parser.cpp
-                    src/memory_helper.cpp test/utest_rp_memory_calculator.cpp
-                    test/utest_rp_string_helper.cpp
-                    src/cpu_helper.cpp test/utest_rp_cpu_helper.cpp)
+add_executable(test src/helper/format_helper.cpp test/utest_rp_format.cpp
+        src/parsing/linux_parser.cpp test/utest_rp_linux_parser.cpp
+        src/helper/memory_helper.cpp test/utest_rp_memory_helper.cpp
+        src/model/process.cpp test/utest_rp_string_helper.cpp src/helper/cpu_helper.cpp test/utest_rp_cpu_helper.cpp test/utest_rp_process.cpp)
 
 file(COPY test/resources DESTINATION Testing)
 
