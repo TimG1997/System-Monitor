@@ -280,6 +280,8 @@ vector<string> LinuxParser::CpuUtilization(long clock_ticks_per_second) {
     cpu_utilizations.push_back(cpu_utilization_string);
   }
 
+  std::sort(cpu_utilizations.begin(), cpu_utilizations.end());
+
   return cpu_utilizations;
 }
 

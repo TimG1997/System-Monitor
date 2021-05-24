@@ -139,8 +139,8 @@ TEST_F(LinuxParserTest, TestCpuUtilization) {
   vector<int> pids{kPidTwo, kPidThree};
   vector<string> cpu_utilizations = linux_parser.CpuUtilization(10);
 
-  string expected_cpu_utilization_one = "PID 1016: 59";
-  string expected_cpu_utilization_two = "PID 1015: 45";
+  string expected_cpu_utilization_one = "PID 1015: 45";
+  string expected_cpu_utilization_two = "PID 1016: 59";
   string expected_cpu_utilization_three = "PID 1017: 29";
 
   string actual_cpu_utilization_one = cpu_utilizations[0];
