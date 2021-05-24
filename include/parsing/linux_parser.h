@@ -6,7 +6,7 @@
 #include <string>
 #include <utility>
 
-#include "cpu_helper.h"
+#include "helper/cpu_helper.h"
 #include "linux_info_file_locations.h"
 
 class LinuxParser {

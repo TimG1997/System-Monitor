@@ -1,7 +1,7 @@
 #include <string>
 
 #include "gtest/gtest.h"
-#include "../include/format.h"
+#include "helper/format_helper.h"
 
 using namespace std;
 

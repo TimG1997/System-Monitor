@@ -1,9 +1,9 @@
 #include <experimental/filesystem>
 #include <string>
 
-#include "../include/linux_parser.h"
 #include "gtest/gtest.h"
 #include "helper/test_helpers.h"
+#include "parsing/linux_parser.h"
 
 #define EXPECT_FLOAT_EQ_WITH_DELTA(val1, val2, delta) \
   EXPECT_TRUE((abs(val1 - val2)) < delta)
@@ -122,7 +122,7 @@ TEST_F(LinuxParserTest, TestStarttimeForPid) {
 }
 
 TEST_F(LinuxParserTest, TestRam) {
-  string expected_ram = "1.632";
+  string expected_ram = "1.632 MB";
   string actual_ram = linux_parser.Ram(kPidOne);
 
   EXPECT_EQ(expected_ram, actual_ram);

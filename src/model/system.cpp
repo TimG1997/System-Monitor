@@ -1,12 +1,14 @@
+#include "model/system.h"
+
 #include <unistd.h>
+
 #include <cstddef>
 #include <set>
 #include <string>
 #include <vector>
 
-#include "process.h"
-#include "processor.h"
-#include "system.h"
+#include "model/process.h"
+#include "model/processor.h"
 
 using std::set;
 using std::size_t;

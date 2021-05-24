@@ -1,4 +1,4 @@
-#include <cpu_helper.h>
+#include <helper/cpu_helper.h>
 
 long CpuHelper::ConvertHertzToSeconds(long time_in_jiffies, long clock_ticks_per_second) {
   return time_in_jiffies / clock_ticks_per_second;

@@ -1,4 +1,4 @@
-#include "linux_parser.h"
+#include "parsing/linux_parser.h"
 
 #include <dirent.h>
 #include <unistd.h>
@@ -10,9 +10,9 @@
 #include <string>
 #include <vector>
 
-#include "cpu_helper.h"
-#include "memory_helper.h"
-#include "string_helper.h"
+#include "helper/cpu_helper.h"
+#include "helper/memory_helper.h"
+#include "helper/string_helper.h"
 
 using std::stof;
 using std::string;
@@ -352,7 +352,7 @@ string LinuxParser::Ram(int pid) {
 
         ram_string_stream << std::fixed << std::setprecision(3) << ram;
 
-        return ram_string_stream.str();
+        return ram_string_stream.str() + " MB";
       }
     }
   }
