@@ -1,16 +1,9 @@
 #include "parsing/linux_parser.h"
 
 #include <dirent.h>
-#include <unistd.h>
 
-#include <execution>
-#include <iomanip>
-#include <numeric>
-#include <sstream>
-#include <string>
-#include <vector>
+#include <iostream>
 
-#include "helper/cpu_helper.h"
 #include "helper/memory_helper.h"
 #include "helper/string_helper.h"
 
@@ -19,43 +12,12 @@ using std::string;
 using std::to_string;
 using std::vector;
 
-LinuxParser::LinuxParser()
-    : kProcDirectory(LinuxInfoFileLocations::kProcDirectory),
-      kCmdlineFilename(LinuxInfoFileLocations::kCmdlineFilename),
-      kCpuinfoFilename(LinuxInfoFileLocations::kCpuinfoFilename),
-      kStatusFilename(LinuxInfoFileLocations::kStatusFilename),
-      kStatFilename(LinuxInfoFileLocations::kStatFilename),
-      kUptimeFilename(LinuxInfoFileLocations::kUptimeFilename),
-      kMeminfoFilename(LinuxInfoFileLocations::kMeminfoFilename),
-      kVersionFilename(LinuxInfoFileLocations::kVersionFilename),
-      kOSPath(LinuxInfoFileLocations::kOSPath),
-      kPasswordPath(LinuxInfoFileLocations::kPasswordPath) {}
-
-// custom file locations (useful for testing)
-LinuxParser::LinuxParser(std::string proc_dir, std::string cmd_line_filename,
-                         std::string cpu_info_filename,
-                         std::string status_filename, std::string stat_filename,
-                         std::string up_time_filename,
-                         std::string mem_info_filename,
-                         std::string version_filename, std::string os_path,
-                         std::string password_path)
-    : kProcDirectory(std::move(proc_dir)),
-      kCmdlineFilename(std::move(cmd_line_filename)),
-      kCpuinfoFilename(std::move(cpu_info_filename)),
-      kStatusFilename(std::move(status_filename)),
-      kStatFilename(std::move(stat_filename)),
-      kUptimeFilename(std::move(up_time_filename)),
-      kMeminfoFilename(std::move(mem_info_filename)),
-      kVersionFilename(std::move(version_filename)),
-      kOSPath(os_path),
-      kPasswordPath(std::move(password_path)) {}
-
 // DONE: An example of how to read data from the filesystem
-string LinuxParser::OperatingSystem() {
+string LinuxParser::OperatingSystem(const std::string& os_path) {
   string line;
   string key;
   string value;
-  std::ifstream filestream(kOSPath);
+  std::ifstream filestream(os_path);
   if (filestream.is_open()) {
     while (std::getline(filestream, line)) {
       std::replace(line.begin(), line.end(), ' ', '_');
@@ -74,10 +36,10 @@ string LinuxParser::OperatingSystem() {
 }
 
 // DONE: An example of how to read data from the filesystem
-string LinuxParser::Kernel() {
+string LinuxParser::Kernel(const std::string& proc_dir, const std::string& version_filename) {
   string os, kernel, version;
   string line;
-  std::string combined_path = kProcDirectory + kVersionFilename;
+  std::string combined_path = proc_dir + version_filename;
   std::ifstream stream(combined_path);
   if (stream.is_open()) {
     std::getline(stream, line);
@@ -88,9 +50,9 @@ string LinuxParser::Kernel() {
 }
 
 // BONUS: Update this to use std::filesystem
-vector<int> LinuxParser::Pids() {
+vector<int> LinuxParser::Pids(const std::string& proc_dir) {
   vector<int> pids;
-  DIR* directory = opendir(kProcDirectory.c_str());
+  DIR* directory = opendir(proc_dir.c_str());
   struct dirent* file;
   while ((file = readdir(directory)) != nullptr) {
     // Is this a directory?
@@ -107,12 +69,12 @@ vector<int> LinuxParser::Pids() {
   return pids;
 }
 
-float LinuxParser::MemoryUtilization() {
+float LinuxParser::MemoryUtilization(const std::string& proc_dir, const std::string& meminfo_filename) {
   long total_memory, free_memory;
 
   string key, memory_number, unit;
   string line;
-  std::ifstream stream(kProcDirectory + kMeminfoFilename);
+  std::ifstream stream(proc_dir + meminfo_filename);
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
       std::istringstream linestream(line);
@@ -129,10 +91,10 @@ float LinuxParser::MemoryUtilization() {
   return MemoryHelper::CalculateTotalUsedMemory(total_memory, free_memory);
 }
 
-long LinuxParser::UpTime() {
+long LinuxParser::UpTime(const std::string& proc_dir, const std::string& uptime_filename) {
   string uptime;
   string line;
-  std::ifstream stream(kProcDirectory + kUptimeFilename);
+  std::ifstream stream(proc_dir + uptime_filename);
   if (stream.is_open()) {
     std::getline(stream, line);
     std::istringstream linestream(line);
@@ -142,9 +104,9 @@ long LinuxParser::UpTime() {
   return stol(uptime);
 }
 
-long LinuxParser::Jiffies() {
+long LinuxParser::Jiffies(const std::string& proc_dir, const std::string& stat_filename) {
   string line;
-  std::ifstream stream(kProcDirectory + kStatFilename);
+  std::ifstream stream(proc_dir + stat_filename);
   if (stream.is_open()) {
     std::getline(stream, line);
 
@@ -176,19 +138,17 @@ long LinuxParser::Jiffies() {
   return 0;
 }
 
-long LinuxParser::ActiveJiffies(int pid) {
-  int utime_index = 14, stime_index = 15, cutime_index = 16, cstime_index = 17;
-
+long LinuxParser::ActiveJiffies(int pid, const std::string& proc_dir, const std::string& stat_filename) {
   string line;
-  string combined_path = kProcDirectory + to_string(pid) + kStatFilename;
+  string combined_path = proc_dir + to_string(pid) + stat_filename;
   std::ifstream stream(combined_path);
   if (stream.is_open()) {
     std::getline(stream, line);
 
     long jiffies_sum = 0;
     vector<long> jiffies = StringHelper::GetElements<long>(
-        line,
-        vector<int>{utime_index, stime_index, cutime_index, cstime_index});
+        line, vector<int>{ProcCPUStates::kUtime_, ProcCPUStates::kStime_,
+                          ProcCPUStates::kCutime_, ProcCPUStates::kCstime_});
 
     for (long jiffie : jiffies) {
       jiffies_sum += jiffie;
@@ -200,9 +160,9 @@ long LinuxParser::ActiveJiffies(int pid) {
   return 0;
 }
 
-long LinuxParser::ActiveJiffies() {
+long LinuxParser::ActiveJiffies(const std::string& proc_dir, const std::string& stat_filename) {
   string line;
-  std::ifstream stream(kProcDirectory + kStatFilename);
+  std::ifstream stream(proc_dir + stat_filename);
   if (stream.is_open()) {
     std::getline(stream, line);
 
@@ -214,7 +174,6 @@ long LinuxParser::ActiveJiffies() {
                                             CPUStates::kUser_,
                                             CPUStates::kNice_,
                                             CPUStates::kSystem_,
-                                            CPUStates::kIOwait_,
                                             CPUStates::kIRQ_,
                                             CPUStates::kSoftIRQ_,
                                             CPUStates::kSteal_,
@@ -233,9 +192,9 @@ long LinuxParser::ActiveJiffies() {
   return 0;
 }
 
-long LinuxParser::IdleJiffies() {
+long LinuxParser::IdleJiffies(const std::string& proc_dir, const std::string& stat_filename) {
   string line;
-  std::ifstream stream(kProcDirectory + kStatFilename);
+  std::ifstream stream(proc_dir + stat_filename);
   if (stream.is_open()) {
     std::getline(stream, line);
 
@@ -244,15 +203,8 @@ long LinuxParser::IdleJiffies() {
     vector<long> cpu_jiffies =
         StringHelper::GetElements<long>(line,
                                         vector<int>{
-                                            CPUStates::kUser_,
-                                            CPUStates::kNice_,
-                                            CPUStates::kSystem_,
                                             CPUStates::kIOwait_,
-                                            CPUStates::kIRQ_,
-                                            CPUStates::kSoftIRQ_,
-                                            CPUStates::kSteal_,
-                                            CPUStates::kGuest_,
-                                            CPUStates::kGuestNice_,
+                                            CPUStates::kIdle_,
                                         },
                                         skip_first_element);
 
@@ -262,33 +214,24 @@ long LinuxParser::IdleJiffies() {
 
     return cpu_jiffies_sum;
   }
+
+  return 0;
 }
 
-vector<string> LinuxParser::CpuUtilization(long clock_ticks_per_second) {
-  vector<string> cpu_utilizations;
-  long up_time = UpTime();
+vector<long> LinuxParser::CpuUtilization(int pid, const std::string& proc_dir, const std::string& stat_filename, const std::string& uptime_filename) {
+  long up_time = UpTime(proc_dir, uptime_filename);
+  long active_jiffies = ActiveJiffies(pid, proc_dir, stat_filename);
+  long start_time = StartTime(pid, proc_dir, stat_filename);
 
-  for (int& pid : this->Pids()) {
-    string combined_path = kProcDirectory + to_string(pid) + (kStatFilename);
-    long active_jiffies = ActiveJiffies(pid);
-    long cpu_utilization = CpuHelper::CalculateCpuUsage(
-        pid, up_time, active_jiffies, clock_ticks_per_second);
-
-    string cpu_utilization_string =
-        "PID " + to_string(pid) + ": " + to_string(cpu_utilization);
-
-    cpu_utilizations.push_back(cpu_utilization_string);
-  }
-
-  std::sort(cpu_utilizations.begin(), cpu_utilizations.end());
+  vector<long> cpu_utilizations{up_time, active_jiffies, start_time};
 
   return cpu_utilizations;
 }
 
-int LinuxParser::TotalProcesses() {
+int LinuxParser::TotalProcesses(const std::string& proc_dir, const std::string& stat_filename) {
   string key, processes_number;
   string line;
-  std::ifstream stream(kProcDirectory + kStatFilename);
+  std::ifstream stream(proc_dir + stat_filename);
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
       std::istringstream linestream(line);
@@ -302,10 +245,10 @@ int LinuxParser::TotalProcesses() {
 
   return 0;
 }
-int LinuxParser::RunningProcesses() {
+int LinuxParser::RunningProcesses(const std::string& proc_dir, const std::string& stat_filename) {
   string key, running_processes_number;
   string line;
-  std::ifstream stream(kProcDirectory + kStatFilename);
+  std::ifstream stream(proc_dir + stat_filename);
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
       std::istringstream linestream(line);
@@ -320,26 +263,21 @@ int LinuxParser::RunningProcesses() {
   return 0;
 }
 
-string LinuxParser::Command(int pid) {
-  string command;
-  string line;
-  string combined_path = kProcDirectory + to_string(pid) + kCmdlineFilename;
-  std::ifstream stream(combined_path);
-  if (stream.is_open()) {
-    std::getline(stream, line);
+string LinuxParser::Command(int pid, const std::string& proc_dir, const std::string& cmdline_filename) {
+  string command, line;
+  std::ifstream filestream(proc_dir + to_string(pid) + cmdline_filename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
     std::istringstream linestream(line);
     linestream >> command;
-
-    return command;
   }
-
-  return string();
+  return command;
 }
 
-string LinuxParser::Ram(int pid) {
+string LinuxParser::Ram(int pid, const std::string& proc_dir, const std::string& status_filename) {
   string key, kilobytes;
   string line;
-  string combined_path = kProcDirectory + to_string(pid) + kStatusFilename;
+  string combined_path = proc_dir + to_string(pid) + status_filename;
   std::ifstream stream(combined_path);
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
@@ -347,12 +285,7 @@ string LinuxParser::Ram(int pid) {
       linestream >> key >> kilobytes;
 
       if (key == "VmSize:") {
-        float ram = MemoryHelper::ConvertKBToMB(stof(kilobytes));
-        std::stringstream ram_string_stream;
-
-        ram_string_stream << std::fixed << std::setprecision(3) << ram;
-
-        return ram_string_stream.str() + " MB";
+        return std::to_string(MemoryHelper::ConvertKBToMB(stol(kilobytes)));
       }
     }
   }
@@ -360,10 +293,10 @@ string LinuxParser::Ram(int pid) {
   return string();
 }
 
-string LinuxParser::Uid(int pid) {
+string LinuxParser::Uid(int pid, const std::string& proc_dir, const std::string& status_filename) {
   string key, uid;
   string line;
-  string combined_path = kProcDirectory + to_string(pid) + kStatusFilename;
+  string combined_path = proc_dir + to_string(pid) + status_filename;
   std::ifstream stream(combined_path);
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
@@ -379,11 +312,11 @@ string LinuxParser::Uid(int pid) {
   return string();
 }
 
-string LinuxParser::User(int pid) {
+string LinuxParser::User(int pid, const std::string& proc_dir, const std::string& status_filename, const std::string& password_path) {
   string line;
-  std::ifstream stream(kPasswordPath);
+  std::ifstream stream(password_path);
   if (stream.is_open()) {
-    string user_uid = Uid(pid);
+    string user_uid = Uid(pid, proc_dir, status_filename);
     const char split_char = ':';
 
     while (std::getline(stream, line)) {
@@ -401,15 +334,17 @@ string LinuxParser::User(int pid) {
   return string();
 }
 
-long LinuxParser::UpTime(int pid) { return UpTime() - StartTime(pid); }
+long LinuxParser::UpTime(int pid, const std::string& proc_dir, const std::string& uptime_filename, const std::string& stat_filename) {
+  return UpTime(proc_dir, uptime_filename) - CpuHelper::ConvertHertzToSeconds(StartTime(pid,proc_dir, stat_filename));
+}
 
-long LinuxParser::StartTime(int pid) {
+long LinuxParser::StartTime(int pid, const std::string& proc_dir, const std::string& stat_filename) {
   string line;
-  string combined_path = kProcDirectory + to_string(pid) + kStatFilename;
+  string combined_path = proc_dir + to_string(pid) + stat_filename;
   std::ifstream stream(combined_path);
   if (stream.is_open()) {
     std::getline(stream, line);
-    return StringHelper::GetElement<long>(line, 22);
+    return StringHelper::GetElement<long>(line, ProcCPUStates::kStarttime_);
   }
 
   return 0;

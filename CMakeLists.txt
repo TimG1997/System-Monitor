@@ -20,7 +20,7 @@ target_link_libraries(test
 
 
 include_directories(include)
-file(GLOB SOURCES "src/*.cpp")
+file(GLOB SOURCES "src/*.cpp" "src/helper/*.cpp" "src/model/*.cpp" "src/parsing/*.cpp")
 
 add_executable(monitor ${SOURCES})
 

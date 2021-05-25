@@ -1,52 +1,50 @@
 #include "model/process.h"
-
-#include <unistd.h>
-
-#include <cctype>
-#include <sstream>
-#include <string>
-#include <vector>
-
-#include "../../include/helper/memory_helper.h"
+#include "helper/cpu_helper.h"
 
 using std::string;
 using std::to_string;
 using std::vector;
 
-Process::Process(int pid, std::string user, std::string command,
-                 float cpu_utilization, std::string ram, long up_time)
-    : pid(pid),
-      user(user),
-      command(command),
-      cpu_utilization(cpu_utilization),
-      ram(ram),
-      up_time(up_time) {}
+Process::Process(int pid) : pid_(pid) {
+  this->determineCpuUtilization();
+}
 
-int Process::Pid() { return this->pid; }
+int Process::Pid() { return this->pid_; }
 
-float Process::CpuUtilization() { return this->cpu_utilization; }
+float Process::CpuUtilization() {
+  long active_jiffies = LinuxParser::ActiveJiffies(this->pid_);
+  long uptime = LinuxParser::UpTime(this->pid_);
 
-string Process::Command() { return this->command; }
+  float active =  (float)(active_jiffies / uptime);
 
-string Process::Ram() { return this->ram; }
+  return active / CpuHelper::ClockTicksPerSecond(); }
 
-string Process::User() { return this->user; }
+string Process::Command() { return LinuxParser::Command(this->pid_); }
 
-long int Process::UpTime() { return this->up_time; }
+string Process::Ram() {
+  return LinuxParser::Ram(this->pid_);
+}
+
+string Process::User() { return LinuxParser::User(this->pid_); }
+
+long int Process::UpTime() { return LinuxParser::UpTime(this->pid_); }
 
 bool Process::operator<(Process const& other_process) const {
-  if (this->cpu_utilization < other_process.cpu_utilization) {
-    return true;
-  } else if (this->cpu_utilization > other_process.cpu_utilization) {
-    return false;
-  } else {
-    int ram_compare_result =
-        MemoryHelper::CompareRamInMBStrings(this->ram, other_process.ram);
-    if (ram_compare_result == 1) {
-      return false;
-    } else {
-      // return true, when the ram consumption is equal or less
-      return true;
-    }
-  }
+  return this->cpu_utilization_ > other_process.cpu_utilization_;
+}
+
+void Process::determineCpuUtilization() {
+  vector<long> cpu_utilizations = LinuxParser::CpuUtilization(this->pid_);
+
+  long up_time = cpu_utilizations[0];
+  float active_jiffies_seconds =
+      CpuHelper::ConvertHertzToSeconds(cpu_utilizations[1]);
+  float start_time_seconds =
+      CpuHelper::ConvertHertzToSeconds(cpu_utilizations[2]);
+
+  float total_cpu_seconds = up_time - start_time_seconds;
+  float active_utilization_seconds =
+      (float)active_jiffies_seconds / (float)total_cpu_seconds;
+
+  this->cpu_utilization_ = active_utilization_seconds;
 }

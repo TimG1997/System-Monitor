@@ -101,6 +101,8 @@ inline T StringHelper::GetElement(std::string input, int index) {
       tmp_index++;
     }
   }
+
+  return {};
 }
 }  // namespace StringHelper
 

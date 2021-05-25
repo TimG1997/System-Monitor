@@ -20,8 +20,8 @@ TEST_F(MemoryHelperTest, TestCalculateTotalUsedMemory){
 
 TEST_F(MemoryHelperTest, TestConvertKBToMB){
   float kilobytes = 2049;
-  float expected_megabytes = 2.049;
-  float actual_megabytes = MemoryHelper::ConvertKBToMB(kilobytes);
+  long expected_megabytes = 2;
+  long actual_megabytes = MemoryHelper::ConvertKBToMB(kilobytes);
 
   EXPECT_FLOAT_EQ(expected_megabytes, actual_megabytes);
 }

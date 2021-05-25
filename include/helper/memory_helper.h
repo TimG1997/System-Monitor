@@ -13,7 +13,7 @@ enum MemoryUnit {
 };
 
 float CalculateTotalUsedMemory(long total_memory, long free_memory);
-float ConvertKBToMB(float kilobytes);
+long ConvertKBToMB(long kilobytes);
 int CompareRamInMBStrings(std::string ram_one, std::string ram_two);
 }
 

@@ -155,8 +155,8 @@ size_t GetThreadCount() {
 
 size_t GetThreadCount() {
   struct procentry64 entry;
-  pid_t pid = getpid();
-  int status = getprocs64(&entry, sizeof(entry), nullptr, 0, &pid, 1);
+  pid_t pid_ = getpid();
+  int status = getprocs64(&entry, sizeof(entry), nullptr, 0, &pid_, 1);
   if (status == 1) {
     return entry.pi_thcount;
   } else {
