@@ -7,20 +7,19 @@ using std::size_t;
 using std::string;
 using std::vector;
 
-System::System(){
+Processor& System::Cpu() {return this->cpu_; }
+
+vector<Process>& System::Processes() {
   this->processes_.clear();
   vector<int> pids = LinuxParser::Pids();
 
-  for (auto &pid : pids) {
+  for (int pid : pids) {
     this->processes_.emplace_back(Process(pid));
   }
 
   std::sort(this->processes_.begin(), this->processes_.end());
-}
 
-Processor& System::Cpu() {return this->cpu_; }
-
-vector<Process>& System::Processes() {
+  return this->processes_;
 }
 
 std::string System::Kernel() { return LinuxParser::Kernel(); }

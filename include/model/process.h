@@ -22,8 +22,6 @@ class Process {
  private:
   int pid_;
   float cpu_utilization_;
-
-  void determineCpuUtilization();
 };
 
 #endif
