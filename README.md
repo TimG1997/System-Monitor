@@ -1,4 +1,4 @@
-# CppND-System-Monitor
+# System-Monitor (2nd Udacity C++ Nanodegree project)
 
 This is the implementation for the second project of the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213).
 
