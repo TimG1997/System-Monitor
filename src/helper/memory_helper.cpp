@@ -9,7 +9,7 @@ float MemoryHelper::CalculateTotalUsedMemory(long total_memory,
   return (total_memory - free_memory) / (float)total_memory;
 }
 
-long MemoryHelper::ConvertKBToMB(long kilobytes) { return kilobytes / 1000; }
+long MemoryHelper::ConvertKBToMB(long kilobytes) { return kilobytes / 1024; }
 
 int MemoryHelper::CompareRamInMBStrings(std::string ram_one,
                                         std::string ram_two) {
