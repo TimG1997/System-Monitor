@@ -72,7 +72,7 @@ inline std::vector<T> GetElements(std::string input, std::vector<int> indezes, i
 }
 
 template <typename T>
-inline T StringHelper::GetElement(std::string input, int index) {
+inline T GetElement(std::string input, int index) {
   if(input.empty()){
     throw std::invalid_argument("The provided string is empty.");
   }
