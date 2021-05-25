@@ -4,7 +4,6 @@ This is the implementation for the second project of the [Udacity C++ Nanodegree
 
 Main subject: implement a system monitor similar to [htop](https://htop.dev/).
 
-Result:
 ![System Monitor](images/monitor.png)
 
 Additional tasks:
